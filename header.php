@@ -4,12 +4,12 @@ include 'db.php';
 
 if (isset($_SESSION['empresa_id'])) {
     $empresaId = $_SESSION['empresa_id'];
-    $stmt = $pdo->prepare("SELECT nome_empresa FROM configuracoes WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT nome_sistema FROM configuracoes WHERE id = ?");
     $stmt->execute([$empresaId]);
     $configuracao = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($configuracao) {
-        $nomeEmpresa = htmlspecialchars($configuracao['nome_empresa']);
+        $nomeEmpresa = htmlspecialchars($configuracao['nome_sistema']);
     } else {
         $nomeEmpresa = 'Nome da Empresa Não Encontrado';
     }
@@ -22,7 +22,7 @@ if (isset($_SESSION['empresa_id'])) {
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title><?php echo isset($title) ? $nomeEmpresa : 'Sistema Advocacia'; ?></title>
+    <title><?php echo $nomeEmpresa; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
 </head>
