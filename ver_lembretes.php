@@ -8,6 +8,7 @@ include 'db.php';
 include 'header.php';
 
 $hoje = new DateTime();
+$hoje->setTime(0, 0, 0);
 $processos = $pdo->query('SELECT * FROM processos WHERE prazo IS NOT NULL')->fetchAll();
 
 $alertas = [];
@@ -16,6 +17,10 @@ foreach ($processos as $processo) {
     $diferenca = $hoje->diff($dataPrazo)->days;
     if ($hoje <= $dataPrazo && $diferenca <= 7) { 
         $alertas[] = "O processo nº {$processo['numero']} está com o prazo próximo: faltam {$diferenca} dias.";
+    } elseif ($diferenca == 0) {
+        $alertas[] = "<div class='alert alert-danger'>O processo nº {$processo['numero']} está vencido</div>";
+    } elseif ($hoje > $dataPrazo) {
+        $alertas[] = "<div class='alert alert-danger'>O processo nº {$processo['numero']} está vencido</div>";
     }
 }
 ?>

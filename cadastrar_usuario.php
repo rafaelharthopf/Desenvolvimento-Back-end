@@ -5,7 +5,7 @@ if (isset($_SESSION['user_id'])) {
 }
 include 'db.php';
 
-function criarUsuario($pdo, $username, $senha) {
+function criarUsuario($pdo, $username, $senha, $nomeCompleto, $cpfCnpj, $numeroOAB) {
     $stmt = $pdo->prepare('SELECT * FROM usuarios WHERE username = ?');
     $stmt->execute([$username]);
     if ($stmt->rowCount() > 0) {
@@ -26,13 +26,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $senha = $_POST['senha'];
     $senhaConfirm = $_POST['senha_confirm'];
+    $nomeCompleto = $_POST['nome_completo'];
+    $cpfCnpj = $_POST['cpf_cnpj'];
+    $numeroOAB = $_POST['numero_oab'];
 
     if ($senha !== $senhaConfirm) {
         $mensagem = "Erro: As senhas não coincidem.";
     } else {
-        $mensagem = criarUsuario($pdo, $username, $senha);
+        $mensagem = criarUsuario($pdo, $username, $senha, $nomeCompleto, $cpfCnpj, $numeroOAB);
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -81,6 +85,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="mb-3">
                 <label for="senha" class="form-label">Senha</label>
                 <input type="password" class="form-control" id="senha" name="senha" required>
+            </div>
+            <div class="mb-3">
+                <label for="senha_confirm" class="form-label">Confirme a Senha</label>
+                <input type="password" class="form-control" id="senha_confirm" name="senha_confirm" required>
             </div>
             <div class="mb-3">
                 <label for="nome_completo" class="form-label">Nome Completo</label>
