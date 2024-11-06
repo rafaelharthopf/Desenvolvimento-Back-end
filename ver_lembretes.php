@@ -80,7 +80,6 @@ foreach ($processos as $processo) {
     <?php endif; ?>
 </div>
 
-<!-- Link para o ícone -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.js"></script>
 
 </body>

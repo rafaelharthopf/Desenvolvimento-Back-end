@@ -32,14 +32,12 @@ $processos = $pdo->query('SELECT * FROM processos')->fetchAll();
 <div class="container mt-5">
     <h2 class="text-center">Dashboard</h2>
     
-    <!-- Alertas -->
     <div class="alert alert-info" role="alert">
         Bem-vindo ao sistema de advocacia! Aqui você pode gerenciar seus clientes e processos.
     </div>
 
     <div class="row">
         <div class="col-md-6">
-            <!-- Cartão para Clientes -->
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Clientes</h4>
@@ -59,7 +57,6 @@ $processos = $pdo->query('SELECT * FROM processos')->fetchAll();
         </div>
 
         <div class="col-md-6">
-            <!-- Cartão para Processos -->
             <div class="card">
                 <div class="card-header">
                     <h4 class="card-title">Processos</h4>

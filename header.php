@@ -1,6 +1,6 @@
 <?php 
-session_start(); // Adicione isso se ainda não estiver em seu código
-include 'db.php'; // Inclua a conexão com o banco de dados
+session_start();
+include 'db.php'; 
 
 if (isset($_SESSION['empresa_id'])) {
     $empresaId = $_SESSION['empresa_id'];

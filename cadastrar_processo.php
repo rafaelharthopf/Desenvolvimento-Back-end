@@ -48,29 +48,29 @@ function cadastrarProcesso($pdo, $dadosProcesso) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #f4f7fa; /* Cor de fundo suave */
+            background-color: #f4f7fa; 
             font-family: 'Arial', sans-serif;
         }
         .container {
             margin-top: 50px;
         }
         .card {
-            border-radius: 10px; /* Bordas arredondadas */
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Sombra suave */
+            border-radius: 10px; 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); 
         }
         h2 {
-            color: #007bff; /* Cor do título */
+            color: #007bff;
             margin-bottom: 30px;
         }
         .alert {
-            border-radius: 10px; /* Bordas arredondadas para alertas */
+            border-radius: 10px; 
         }
         .btn-primary {
-            background-color: #007bff; /* Azul padrão */
+            background-color: #007bff; 
             border: none;
         }
         .btn-primary:hover {
-            background-color: #0056b3; /* Azul escuro ao passar o mouse */
+            background-color: #0056b3; 
         }
     </style>
     <script>

@@ -9,9 +9,8 @@ function buscarUsuarios($pdo) {
 }
 
 $usuarios = buscarUsuarios($pdo);
-$usuario = null; // Inicialize a variável como null
+$usuario = null; 
 
-// Se o ID do usuário for enviado via GET, carregar o formulário de edição
 if (isset($_GET['edit']) && is_numeric($_GET['edit'])) {
     $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE id = ?");
     $stmt->execute([$_GET['edit']]);
@@ -31,8 +30,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['edit']) && is_numeric(
 
     if ($stmt->rowCount() > 0) {
         echo '<div class="alert alert-success mt-3">Usuário atualizado com sucesso!</div>';
-        $usuarios = buscarUsuarios($pdo); // Atualiza a lista de usuários após a edição
-        $usuario = null; // Limpa a variável após a atualização para não exibir o formulário
+        $usuarios = buscarUsuarios($pdo); 
+        $usuario = null; 
     } else {
         echo '<div class="alert alert-danger mt-3">Erro ao atualizar o usuário.</div>';
     }

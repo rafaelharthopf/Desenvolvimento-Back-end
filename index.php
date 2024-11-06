@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            background-color: #f4f7fa; /* Cor de fundo suave */
+            background-color: #f4f7fa; 
             font-family: 'Arial', sans-serif;
         }
         .container {
