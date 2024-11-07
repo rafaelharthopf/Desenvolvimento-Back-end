@@ -1,17 +1,27 @@
+/* Garante que o body use o modelo de layout flexível */
 body {
     display: flex;
     flex-direction: column;
-    min-height: 100vh; 
+    min-height: 100vh;  /* Garante que a altura mínima seja 100% da altura da tela */
+    margin: 0;  /* Remove qualquer margem do body */
 }
+
+/* A .container vai crescer e ocupar o espaço disponível */
 .container {
-    flex: 1; 
+    flex-grow: 1;  /* Isso faz a área de conteúdo crescer */
 }
+
+/* Estilização do footer */
 footer {
-    background-color: #f8f9fa; 
-    border-top: 1px solid #e9ecef; 
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
     text-align: center;
-    padding: 1rem 0; 
+    padding: 1rem 0;
+    width: 100%; /* Garante que o footer ocupe toda a largura */
+    margin-top: auto; /* Garante que o footer seja empurrado para baixo, se necessário */
 }
+
+/* Estilizando o texto no footer */
 footer .text-center {
     color: #6c757d;
 }

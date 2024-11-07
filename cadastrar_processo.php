@@ -1,6 +1,10 @@
 <?php
 session_start();
 include 'db.php'; 
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
 include 'header.php';
 
 function buscarTodosClientes($pdo) {
@@ -73,39 +77,6 @@ function cadastrarProcesso($pdo, $dadosProcesso) {
             background-color: #0056b3; 
         }
     </style>
-    <script>
-        async function buscarClientes() {
-            const input = document.getElementById('cliente');
-            const datalist = document.getElementById('clientes');
-            datalist.innerHTML = ''; 
-
-            if (input.value.length < 2) return; 
-
-            const response = await fetch(`cadastrar_processo.php?search=${input.value}`);
-            const clientes = await response.json();
-
-            clientes.forEach(cliente => {
-                const option = document.createElement('option');
-                option.value = cliente.nome; 
-                option.dataset.id = cliente.id; 
-                option.dataset.cpf = cliente.cpf_cnpj; 
-                datalist.appendChild(option);
-            });
-        }
-
-        function adicionarClienteId() {
-            const input = document.getElementById('cliente');
-            const datalist = document.getElementById('clientes');
-            const selectedOption = datalist.querySelector(`option[value="${input.value}"]`);
-            if (selectedOption) {
-                const clienteIdInput = document.createElement('input');
-                clienteIdInput.type = 'hidden';
-                clienteIdInput.name = 'cliente_id';
-                clienteIdInput.value = selectedOption.dataset.id; 
-                input.form.appendChild(clienteIdInput);
-            }
-        }
-    </script>
 </head>
 <body>
 <div class="container">
@@ -114,11 +85,15 @@ function cadastrarProcesso($pdo, $dadosProcesso) {
         <?php if (isset($mensagem)): ?>
             <div class="alert alert-info mt-3"><?= $mensagem ?></div>
         <?php endif; ?>
-        <form method="post" onsubmit="adicionarClienteId()">
+        <form method="post">
             <div class="mb-3">
                 <label for="cliente" class="form-label">Cliente</label>
-                <input list="clientes" class="form-control" id="cliente" name="cliente" oninput="buscarClientes()" required>
-                <datalist id="clientes"></datalist>
+                <select class="form-select" id="cliente" name="cliente_id" required>
+                    <option value="" disabled selected>Escolha um Cliente</option>
+                    <?php foreach ($clientes as $cliente): ?>
+                        <option value="<?= $cliente['id'] ?>"><?= $cliente['nome'] ?> - <?= $cliente['cpf_cnpj'] ?></option>
+                    <?php endforeach; ?>
+                </select>
             </div>
             <div class="mb-3">
                 <label for="tipo" class="form-label">Tipo</label>

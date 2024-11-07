@@ -36,7 +36,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mensagem = criarUsuario($pdo, $username, $senha, $nomeCompleto, $cpfCnpj, $numeroOAB);
     }
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -71,6 +70,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .btn-primary:hover {
             background-color: #0056b3; 
         }
+        .btn-secondary {
+            background-color: #6c757d; 
+            border: none;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268; 
+        }
     </style>
 </head>
 <body>
@@ -104,6 +110,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <button type="submit" class="btn btn-primary">Criar</button>
         </form>
+
+        <?php if (!isset($_SESSION['user_id'])): ?>
+            <a href="index.php" class="btn btn-secondary mt-3">Voltar para a Página Inicial</a>
+        <?php endif; ?>
+
         <?php if (isset($mensagem)): ?>
             <div class="alert alert-info mt-3"><?= htmlspecialchars($mensagem) ?></div>
         <?php endif; ?>

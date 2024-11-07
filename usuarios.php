@@ -1,6 +1,10 @@
 <?php
 session_start();
 include 'db.php';
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
 include 'header.php';
 
 function buscarUsuarios($pdo) {
@@ -76,106 +80,129 @@ if (isset($_GET['delete'])) {
     <title>Usuários</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .container {
-            max-width: 900px;
+        body {
+            background-color: #f4f7fa;
+            font-family: 'Arial', sans-serif;
         }
-        .table th, .table td {
+        .container {
+            margin-top: 50px;
+        }
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h2 {
+            color: #007bff;
+            margin-bottom: 30px;
             text-align: center;
         }
-        .btn-warning {
-            width: 100%;
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
         }
-        .form-control, .btn {
-            border-radius: 0.375rem;
+        .btn-primary:hover {
+            background-color: #0056b3;
         }
-        .form-label {
-            font-weight: bold;
+        .btn-warning, .btn-danger, .btn-secondary {
+            border: none;
+            width: auto;
         }
         .alert {
-            font-size: 1rem;
+            border-radius: 10px;
+        }
+        .table thead {
+            background-color: #007bff;
+            color: white;
+        }
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
         }
     </style>
 </head>
 <body>
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Lista de Usuários</h2>
-    
-    <table class="table table-striped">
-        <thead class="thead-dark">
-            <tr>
-                <th>Nome de Usuário</th>
-                <th>Nome Completo</th>
-                <th>Cargo</th>
-                <th>CPF/CNPJ</th>
-                <th>Número da OAB</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($usuarios as $usuarioRow): ?>
+
+<div class="container">
+    <div class="card">
+        <h2>Lista de Usuários</h2>
+        <table class="table table-striped">
+            <thead>
                 <tr>
-                    <td><?= htmlspecialchars($usuarioRow['username']) ?></td>
-                    <td><?= htmlspecialchars($usuarioRow['nome_completo']) ?></td>
-                    <td><?= htmlspecialchars($usuarioRow['cargo']) ?></td>
-                    <td><?= htmlspecialchars($usuarioRow['cpf_cnpj']) ?></td>
-                    <td><?= htmlspecialchars($usuarioRow['numero_oab']) ?></td>
-                    <td>
-                        <a href="?edit=<?= $usuarioRow['id'] ?>" class="btn btn-warning btn-sm">Editar</a>
-                        <a href="?delete=<?= $usuarioRow['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este usuário?')">Excluir</a>
-                        <a href="?change_password=<?= $usuarioRow['id'] ?>" class="btn btn-secondary btn-sm">Alterar Senha</a>
-                    </td>
+                    <th>Nome de Usuário</th>
+                    <th>Nome Completo</th>
+                    <th>Cargo</th>
+                    <th>CPF/CNPJ</th>
+                    <th>Número da OAB</th>
+                    <th>Ações</th>
                 </tr>
-            <?php endforeach; ?>
-        </tbody>
-
-    </table>
-
-    <?php if ($usuario): ?>
-        <div class="mt-4">
-            <h3 class="text-center">Editar Usuário</h3>
-            <form method="post">
-                <div class="mb-3">
-                    <label for="username" class="form-label">Nome de Usuário</label>
-                    <input type="text" class="form-control" id="username" name="username" value="<?= htmlspecialchars($usuario['username']) ?>" required>
-                </div>
-                <div class="mb-3">
-                    <label for="nome_completo" class="form-label">Nome Completo</label>
-                    <input type="text" class="form-control" id="nome_completo" name="nome_completo" value="<?= htmlspecialchars($usuario['nome_completo']) ?>" required>
-                </div>
-                <div class="mb-3">
-                    <label for="cargo" class="form-label">Cargo</label>
-                    <input type="text" class="form-control" id="cargo" name="cargo" value="<?= htmlspecialchars($usuario['cargo']) ?>" required>
-                </div>
-                <div class="mb-3">
-                    <label for="cpf_cnpj" class="form-label">CPF/CNPJ</label>
-                    <input type="text" class="form-control" id="cpf_cnpj" name="cpf_cnpj" value="<?= htmlspecialchars($usuario['cpf_cnpj']) ?>" required>
-                </div>
-                <div class="mb-3">
-                    <label for="numero_oab" class="form-label">Número da OAB</label>
-                    <input type="text" class="form-control" id="numero_oab" name="numero_oab" value="<?= htmlspecialchars($usuario['numero_oab']) ?>" required>
-                </div>
-                <button type="submit" class="btn btn-success w-100">Atualizar</button>
-            </form>
-        </div>
-    <?php endif; ?>
-    <?php if (isset($_GET['change_password'])): ?>
-        <div class="mt-4">
-            <h3 class="text-center">Alterar Senha</h3>
-            <form method="post">
-                <div class="mb-3">
-                    <label for="nova_senha" class="form-label">Nova Senha</label>
-                    <input type="password" class="form-control" id="nova_senha" name="nova_senha" required>
-                </div>
-                <div class="mb-3">
-                    <label for="confirmar_senha" class="form-label">Confirme a Nova Senha</label>
-                    <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" required>
-                </div>
-                <button type="submit" class="btn btn-success w-100">Alterar Senha</button>
-            </form>
-        </div>
-    <?php endif; ?>
+            </thead>
+            <tbody>
+                <?php foreach ($usuarios as $usuarioRow): ?>
+                    <tr>
+                        <td><?= htmlspecialchars($usuarioRow['username']) ?></td>
+                        <td><?= htmlspecialchars($usuarioRow['nome_completo']) ?></td>
+                        <td><?= htmlspecialchars($usuarioRow['cargo']) ?></td>
+                        <td><?= htmlspecialchars($usuarioRow['cpf_cnpj']) ?></td>
+                        <td><?= htmlspecialchars($usuarioRow['numero_oab']) ?></td>
+                        <td>
+                            <a href="?edit=<?= $usuarioRow['id'] ?>" class="btn btn-warning btn-sm">Editar</a>
+                            <a href="?delete=<?= $usuarioRow['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este usuário?')">Excluir</a>
+                            <a href="?change_password=<?= $usuarioRow['id'] ?>" class="btn btn-secondary btn-sm">Alterar Senha</a>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+        <?php if ($usuario): ?>
+            <div class="card mt-4">
+                <h3 class="text-center">Editar Usuário</h3>
+                <form method="post">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Nome de Usuário</label>
+                        <input type="text" class="form-control" id="username" name="username" value="<?= htmlspecialchars($usuario['username']) ?>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="nome_completo" class="form-label">Nome Completo</label>
+                        <input type="text" class="form-control" id="nome_completo" name="nome_completo" value="<?= htmlspecialchars($usuario['nome_completo']) ?>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cargo" class="form-label">Cargo</label>
+                        <input type="text" class="form-control" id="cargo" name="cargo" value="<?= htmlspecialchars($usuario['cargo']) ?>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cpf_cnpj" class="form-label">CPF/CNPJ</label>
+                        <input type="text" class="form-control" id="cpf_cnpj" name="cpf_cnpj" value="<?= htmlspecialchars($usuario['cpf_cnpj']) ?>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="numero_oab" class="form-label">Número da OAB</label>
+                        <input type="text" class="form-control" id="numero_oab" name="numero_oab" value="<?= htmlspecialchars($usuario['numero_oab']) ?>" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Atualizar</button>
+                </form>
+            </div>
+        <?php endif; ?>
+        <?php if (isset($_GET['change_password'])): ?>
+            <div class="card mt-4">
+                <h3 class="text-center">Alterar Senha</h3>
+                <form method="post">
+                    <div class="mb-3">
+                        <label for="nova_senha" class="form-label">Nova Senha</label>
+                        <input type="password" class="form-control" id="nova_senha" name="nova_senha" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmar_senha" class="form-label">Confirme a Nova Senha</label>
+                        <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Alterar Senha</button>
+                </form>
+            </div>
+        <?php endif; ?>
+        <?php if (isset($mensagem)): ?>
+            <div class="alert alert-info mt-3"><?= $mensagem ?></div>
+        <?php endif; ?>
+    </div>
 </div>
-</body>
-</html>
 
 <?php include 'footer.php'; ?>
+</body>
+</html>

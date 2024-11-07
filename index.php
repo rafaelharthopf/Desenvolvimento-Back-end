@@ -1,61 +1,79 @@
 <?php
 session_start();
-if (isset($_SESSION['user_id'])) {
-    header('Location: dashboard.php');
-    exit;
-}
 include 'db.php';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'];
-    $senha = $_POST['senha'];
+$empresaId = 1;
+if ($empresaId == 1) {
+    $stmt = $pdo->prepare("SELECT * FROM configuracoes WHERE id = ?");
+    $stmt->execute([$empresaId]);
+    $configuracao = $stmt->fetch(PDO::FETCH_ASSOC);
+    $userId = $_SESSION['user_id'];
+    $stmt = $pdo->prepare('SELECT nome_completo FROM usuarios WHERE id = ?');
+    $stmt->execute([$userId]);
+    $usuario = $stmt->fetch();
 
-    $stmt = $pdo->prepare('SELECT * FROM usuarios WHERE username = ?');
-    $stmt->execute([$username]);
-    $user = $stmt->fetch();
-
-    if ($user && password_verify($senha, $user['senha'])) {
-        $_SESSION['user_id'] = $user['id'];
-        header('Location: dashboard.php');
-        exit;
+    if ($configuracao) {
+        $nomeEmpresa = htmlspecialchars($configuracao['nome_sistema']);
+        $enderecoEmpresa = htmlspecialchars($configuracao['endereco_sistema']);
+        $emailEmpresa = htmlspecialchars($configuracao['email']);
+        $telefoneEmpresa = htmlspecialchars($configuracao['telefone']);
+        $logoEmpresa = htmlspecialchars($configuracao['logo']);
     } else {
-        $erro = "Usuário ou senha incorretos.";
+        $nomeEmpresa = 'Nome da Empresa Não Encontrado';
+        $enderecoEmpresa = 'Endereço da Empresa Não Encontrado';
+        $emailEmpresa = 'Email da Empresa Não Encontrado';
+        $telefoneEmpresa = 'Telefone da Empresa Não Encontrado';
+        $logoEmpresa = ''; 
     }
+} else {
+    $nomeEmpresa = 'Sistema Advocacia';
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Login - Sistema Advocacia</title>
+    <title>Bem-vindo à <?php echo $nomeEmpresa; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"> <!-- Ícones -->
     <style>
         body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            background-color: #f4f7fa; 
+            background-color: #f4f7fa;
             font-family: 'Arial', sans-serif;
         }
         .container {
-            flex: 1;
-            max-width: 800px; /
+            max-width: 900px;
             margin: auto;
-            padding: 2rem;
-            background-color: #ffffff; 
-            border-radius: 8px; 
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); 
+            padding: 3rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
         h2 {
             margin-bottom: 1.5rem;
-            color: #007bff; 
+            color: #007bff;
         }
         .btn-primary {
             background-color: #007bff;
             border: none;
         }
         .btn-primary:hover {
-            background-color: #0056b3; 
+            background-color: #0056b3;
+        }
+        .empresa-logo {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .empresa-descricao {
+            font-size: 1.1em;
+            color: #555;
+            margin-top: 20px;
+        }
+        .empresa-info {
+            margin-top: 20px;
         }
         footer {
             background-color: #f8f9fa;
@@ -63,38 +81,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding: 1rem 0;
         }
         footer .text-center {
-            color: #6c757d; 
+            color: #6c757d;
         }
-        .alert-danger {
-            margin-top: 1rem;
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-<div class="container mt-5">
-    <h2 class="text-center">Login</h2>
-    <form method="post" class="mt-3">
-    <?php if (isset($erro)) echo "<div class='alert alert-danger mt-2'>$erro</div>"; ?>
-        <div class="mb-3">
-            <label for="username" class="form-label">Usuário</label>
-            <input type="text" class="form-control" id="username" name="username" required>
+    <div class="container mt-5">
+        <div class="text-center mt-4 mb-4">
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <p>Olá, <?php echo htmlspecialchars($usuario['nome_completo']); ?>!</p>
+                <a href="dashboard.php" class="btn btn-primary">Ir para o Dashboard</a>
+            <?php else: ?>
+                <a href="login.php" class="btn btn-primary">Entrar no Sistema</a>
+            <?php endif; ?>
         </div>
-        <div class="mb-3">
-            <label for="senha" class="form-label">Senha</label>
-            <input type="password" class="form-control" id="senha" name="senha" required>
+
+        <h2 class="text-center">Bem-vindo à <?php echo $nomeEmpresa; ?></h2>
+
+        <div class="text-center">
+            <img src="uploads/logos/logo.jpg<?php echo $logoEmpresa; ?>" alt="Logo da Empresa" class="empresa-logo">
         </div>
-        <div class="btn mb-3 w-100">
-            <button type="submit" class="btn btn-primary w-100">Entrar</button>
-            <hr>
-            <a href="cadastrar_usuario.php" class="btn btn-primary mb-3 w-100">Cadastrar Usuário</a>
+
+        <div class="text-center mb-4">
+            <a href="about.php" class="btn btn-info"><i class="fas fa-info-circle"></i> Sobre a Empresa</a>
         </div>
-    </form>
-</div>
-<footer>
-    <div class="text-center">
-        © <?php echo date("Y"); ?> - Empresa XYZ - TOLEDO
+
+        <div class="empresa-descricao">
+            <p>A <?php echo $nomeEmpresa; ?> é uma empresa consolidada no mercado jurídico, atuando com excelência há mais de 10 anos no estado de São Paulo. A empresa foi fundada com a missão de oferecer soluções jurídicas personalizadas para cada cliente, sempre com base na ética, compromisso e transparência. Com experiência em diversas áreas do direito, a <?php echo $nomeEmpresa; ?> se destaca no atendimento a pessoas físicas e jurídicas, buscando sempre a melhor solução para cada situação.</p>
+        </div>
     </div>
-</footer>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+<?php include 'footer.php'; ?>
