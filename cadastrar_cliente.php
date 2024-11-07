@@ -7,6 +7,8 @@ if (!isset($_SESSION['user_id'])) {
 }
 include 'header.php';
 
+require('fpdf/fpdf.php');
+
 function criarCliente($pdo, $dadosCliente) {
     if (empty($dadosCliente['cpf_cnpj']) || empty($dadosCliente['nome']) || empty($dadosCliente['email'])) {
         return "Erro: CPF/CNPJ, Nome e E-mail são obrigatórios.";
@@ -26,15 +28,72 @@ function criarCliente($pdo, $dadosCliente) {
         $dadosCliente['pasep_pis'] ?? null,
         $dadosCliente['numero_beneficio'] ?? null
     ])) {
-        return "Cliente cadastrado com sucesso!";
+        return $pdo->lastInsertId();
     } else {
         return "Erro ao cadastrar cliente.";
     }
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $mensagem = criarCliente($pdo, $_POST);
+$empresaId = 1;
+$empresa = $pdo->prepare('SELECT * FROM configuracoes WHERE id = ?');
+$empresa->execute([$empresaId]);
+$empresa = $empresa->fetch();
+
+function gerarContratoPDF($dadosCliente, $clienteId) {
+    try {
+        $pdf = new FPDF();
+        $pdf->AddPage();
+        $pdf->SetFont('Arial', 'B', 16);
+        $pdf->Cell(190, 10, utf8_decode('Contrato de Trabalho e LGPD'), 0, 1, 'C');
+        $pdf->Ln(10);
+
+        $pdf->SetFont('Arial', '', 12);
+        $pdf->Cell(100, 10, utf8_decode('Nome: ' . $dadosCliente['nome']), 0, 1);
+        $pdf->Cell(100, 10, utf8_decode('CPF/CNPJ: ' . $dadosCliente['cpf_cnpj']), 0, 1);
+        $pdf->Cell(100, 10, utf8_decode('E-mail: ' . $dadosCliente['email']), 0, 1);
+        $pdf->Cell(100, 10, utf8_decode('Endereço: ' . $dadosCliente['endereco']), 0, 1);
+        $pdf->Cell(100, 10, utf8_decode('Data de Nascimento: ' . $dadosCliente['data_nascimento']), 0, 1);
+        $pdf->Ln(10);
+
+        $textoContrato = "Cláusula 1: O cliente está ciente e concorda com o tratamento de seus dados pessoais conforme a Lei Geral de Proteção de Dados (LGPD). Todos os dados fornecidos são tratados de maneira confidencial e não serão divulgados sem o seu consentimento, exceto quando exigido por lei.\n\nCláusula 2: O cliente concorda com as condições do contrato de trabalho, incluindo as responsabilidades e direitos estabelecidos, que serão detalhados posteriormente. O presente contrato entra em vigor a partir da data de assinatura.";
+        $pdf->MultiCell(0, 10, utf8_decode($textoContrato));
+        $pdf->Ln(10);
+        $pdf->Cell(80, 10, '_________________________', 0, 1, 'L');
+        $pdf->Cell(80, 10, utf8_decode($dadosCliente['nome']), 0, 1, 'L');
+        $pdf->Cell(80, 10, '_________________________', 0, 1, 'L');
+        $pdf->Cell(80, 10, utf8_decode($empresa['nome_sistema']), 0, 1, 'L');
+
+        $nomeArquivoPDF = 'contrato_cliente_' . $clienteId . '.pdf';
+        $caminhoArquivo = 'uploads/' . $nomeArquivoPDF;
+        
+        $pdf->Output('F', $caminhoArquivo);
+        return $nomeArquivoPDF;
+    } catch (Exception $e) {
+        return false;
+    }
 }
+$mensagem = '';
+
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['aceite']) && $_POST['aceite'] == 'on') {
+        $clienteId = criarCliente($pdo, $_POST);
+        
+        if (is_numeric($clienteId)) {
+            $nomeArquivoPDF = gerarContratoPDF($_POST, $clienteId);
+            if ($nomeArquivoPDF) {
+                $mensagem = "Cliente cadastrado com sucesso! <a href='uploads/{$nomeArquivoPDF}' download>Baixar Contrato</a>";
+            } else {
+                $mensagem = "<div class='alert alert-danger'>Erro ao gerar o contrato em PDF.</div>";
+            }
+        } else {
+            $mensagem = "<div class='alert alert-danger'>{$clienteId}</div>";
+        }
+    } else {
+        $mensagem = "<div class='alert alert-danger'>Você deve aceitar os termos antes de continuar.</div>";
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -75,6 +134,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="container">
     <div class="card p-4">
         <h2>Cadastrar Cliente</h2>
+        <?php if ($mensagem): ?>
+            <div class="alert alert-info mt-3"><?= $mensagem ?></div>
+        <?php endif; ?>
         <form method="post">
             <div class="mb-3">
                 <label for="cpf_cnpj" class="form-label">CPF/CNPJ</label>
@@ -120,13 +182,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label for="numero_beneficio" class="form-label">Número de Benefício</label>
                 <input type="text" class="form-control" id="numero_beneficio" name="numero_beneficio">
             </div>
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" value="on" id="aceite" name="aceite" required>
+                <label class="form-check-label" for="aceite">
+                    Eu aceito os termos da LGPD e do contrato.
+                </label>
+            </div>
             <button type="submit" class="btn btn-primary">Cadastrar</button>
         </form>
-
-        <?php if (isset($mensagem)): ?>
-            <div class="alert alert-info mt-3"><?= $mensagem ?></div>
-        <?php endif; ?>
     </div>
 </div>
 </body>
 </html>
+<?php include 'footer.php'; ?>

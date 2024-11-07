@@ -149,7 +149,6 @@ if ($empresaId == 1) {
                         <a href="cadastrar_processo.php">Cadastrar Processo</a>
                     </div>
                 </div>
-                <a href="about.php" class="icon-link"><i class="fas fa-legal"> Quem Somos nós?</i></a>
                 <a href="editar_configuracoes.php" class="icon-link"><i class="fas fa-cog"></i></a>
                 <a href="logout.php" class="icon-link"><i class="fas fa-sign-out-alt"></i></a>
             </div>

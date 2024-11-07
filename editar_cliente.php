@@ -1,8 +1,8 @@
 <?php
-session_start();
+session_start(); 
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
-    exit;
+    exit; 
 }
 include 'db.php';
 include 'header.php';
@@ -22,7 +22,7 @@ if (!$cliente) {
     exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_POST) {
     $dadosCliente = [
         'cpf_cnpj' => $_POST['cpf_cnpj'],
         'nome' => $_POST['nome'],
@@ -36,6 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'pasep_pis' => $_POST['pasep_pis'] ?? null,
         'numero_beneficio' => $_POST['numero_beneficio'] ?? null,
     ];
+    sleep(2);
+    $_SESSION['mensagem'] = "Dados do cliente atualizados com sucesso.";
 
     $stmt = $pdo->prepare('UPDATE clientes SET cpf_cnpj = ?, nome = ?, rg_ie = ?, email = ?, endereco = ?, conjugue = ?, nome_mae = ?, data_nascimento = ?, local_nascimento = ?, pasep_pis = ?, numero_beneficio = ? WHERE id = ?');
     $stmt->execute([
@@ -52,12 +54,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $dadosCliente['numero_beneficio'],
         $clienteId
     ]);
-
-    $_SESSION['mensagem'] = "Dados do cliente atualizados com sucesso.";
-    header("Location: detalhes_cliente.php?id=" . urlencode($clienteId));
+    echo "<script>
+        window.location.href = 'editar_cliente.php?id=" . $clienteId . "';
+    </script>";
     exit;
+    
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -90,6 +94,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .alert {
             border-radius: 10px; 
         }
+        #loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+            color: red;
+        }
+        #loading img {
+            width: 30px;
+            height: 30px;
+        }
     </style>
 </head>
 <body>
@@ -97,14 +111,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="card p-4">
         <h2>Editar Cliente: <?php echo htmlspecialchars($cliente['nome']); ?></h2>
 
-        <?php if (isset($_SESSION['mensagem'])): ?>
-            <div class="alert alert-info">
-                <?php echo $_SESSION['mensagem']; ?>
-            </div>
-            <?php unset($_SESSION['mensagem']); ?>
-        <?php endif; ?>
+        <?php
+        if (isset($_SESSION['mensagem'])) {
+            echo "<div class='alert alert-info'>" . $_SESSION['mensagem'] . "</div>";
+            unset($_SESSION['mensagem']); 
+        }
+        ?>
 
-        <form action="editar_cliente.php?id=<?php echo urlencode($clienteId); ?>" method="POST">
+        <form method="POST" onsubmit="showLoading()">
+            <div id="loading">
+                <img src="https://i.gifer.com/YCZH.gif" alt="Carregando..."> Carregando, por favor aguarde...
+            </div>
             <div class="mb-3">
                 <label for="cpf_cnpj" class="form-label">CPF/CNPJ</label>
                 <input type="text" class="form-control" id="cpf_cnpj" name="cpf_cnpj" value="<?php echo htmlspecialchars($cliente['cpf_cnpj']); ?>" required>
@@ -158,5 +175,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function showLoading() {
+    document.getElementById('loading').style.display = 'block'; 
+}
+</script>
 </body>
 </html>
+<?php include 'footer.php'; ?>
