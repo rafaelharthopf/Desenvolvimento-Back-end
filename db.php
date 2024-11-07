@@ -1,8 +1,8 @@
 <?php
-$host = 'localhost';
-$dbname = 'sistema_advocacia';
-$username = 'root';
-$password = 'Bavarias1996';
+$host = 'phpmyadmin.mikrotikrio.dev.br';
+$dbname = 'mkauth';
+$username = 'rafael@receitanet.net';
+$password = 'Bavarias@1996';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
