@@ -11,7 +11,7 @@ function buscarClientesParado($pdo) {
     $stmt = $pdo->query("SELECT clientes.id AS cliente_id, clientes.cpf_cnpj, clientes.nome, clientes.email, processos.id AS processo_id, processos.numero AS processo_numero, processos.tipo 
                          FROM clientes
                          LEFT JOIN processos ON clientes.id = processos.cliente_id
-                         WHERE processos.status = 'Parado'");
+                         WHERE processos.status = 'Suspenso'");
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -55,7 +55,7 @@ $clientesParado = buscarClientesParado($pdo);
 <body>
 <div class="container">
     <div class="card p-4">
-        <h2>Clientes Parado</h2>
+        <h2>Processos Suspensos</h2>
         <table class="table table-striped">
             <thead>
                 <tr>

@@ -105,7 +105,7 @@ if (isset($_SESSION['mensagem'])) {
         <select class="form-select mb-2" name="status">
             <option value="Em Andamento" <?php echo $processo['status'] === 'Em Andamento' ? 'selected' : ''; ?>>Em Andamento</option>
             <option value="Concluído" <?php echo $processo['status'] === 'Concluído' ? 'selected' : ''; ?>>Concluído</option>
-            <option value="Parado" <?php echo $processo['status'] === 'Parado' ? 'selected' : ''; ?>>Parado</option>
+            <option value="Suspenso" <?php echo $processo['status'] === 'Suspenso' ? 'selected' : ''; ?>>Suspenso</option>
             <option value="Arquivado" <?php echo $processo['status'] === 'Arquivado' ? 'selected' : ''; ?>>Arquivado</option>
         </select>
         <button class="btn btn-primary" type="submit">Atualizar Status</button>

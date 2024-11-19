@@ -55,7 +55,7 @@ $clientesAndamento = buscarClientesAndamento($pdo);
 <body>
 <div class="container">
     <div class="card p-4">
-        <h2>Clientes Em Andamento</h2>
+        <h2>Processos Em Andamento</h2>
         <table class="table table-striped">
             <thead>
                 <tr>

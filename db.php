@@ -20,7 +20,8 @@ try {
         data_nascimento DATE,
         local_nascimento VARCHAR(255),
         pasep_pis VARCHAR(20),
-        numero_beneficio VARCHAR(20)
+        numero_beneficio VARCHAR(20),
+        foto_cliente VARCHAR(255) DEFAULT NULL
     )");
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS arquivos (
@@ -29,9 +30,10 @@ try {
         nome VARCHAR(255) NOT NULL,
         caminho VARCHAR(255) NOT NULL,
         data_upload DATETIME DEFAULT CURRENT_TIMESTAMP,
-        arquivo_comprimido BOOLEAN DEFAULT 0,
+        arquivo_comprimido LONGBLOB,
         FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE
     )");
+
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS configuracoes (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -39,7 +41,7 @@ try {
         email VARCHAR(255),
         telefone VARCHAR(20),
         endereco_sistema TEXT,
-        dias_prazo INT
+        dias_prazo INT DEFAULT NULL
     )");
 
     $pdo->exec("CREATE TABLE IF NOT EXISTS processos (
@@ -67,6 +69,21 @@ try {
         cpf_cnpj VARCHAR(20),
         numero_oab VARCHAR(20)
     )");
+
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM configuracoes");
+    $stmt->execute();
+    $exists = $stmt->fetchColumn();
+
+    if ($exists == 0) {
+        $pdo->exec("INSERT INTO configuracoes (nome_sistema, email, telefone, endereco_sistema, dias_prazo) 
+                    VALUES (
+                        'Zola & Klébis Sociedade de Advogados', 
+                        'zkadvogados@gmail.com', 
+                        '1832232706', 
+                        'R. Ângelo Rotta, 137 - Jardim Petropolis, Pres. Prudente - SP, 19060-420',
+                        NULL
+                    )");
+    }
 
 } catch (PDOException $e) {
     die("Erro de conexão: " . $e->getMessage());

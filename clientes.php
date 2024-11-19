@@ -49,6 +49,8 @@ if (isset($_GET['archive'])) {
     <meta charset="UTF-8">
     <title>Lista de Clientes</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
     <style>
         body {
             background-color: #f4f7fa;
@@ -103,9 +105,9 @@ if (isset($_GET['archive'])) {
                         <td><?= htmlspecialchars($cliente['email']) ?></td>
                         <td><?= htmlspecialchars($cliente['status']) ?></td>
                         <td>
-                            <a href="editar_cliente.php?id=<?= $cliente['id'] ?>" class="btn btn-warning btn-sm">Editar</a>
-                            <a href="?delete=<?= $cliente['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este cliente?')">Excluir</a>
-                            <a href="?archive=<?= $cliente['id'] ?>" class="btn btn-secondary btn-sm">Arquivar</a>
+                            <a href="editar_cliente.php?id=<?= $cliente['id'] ?>" class="btn btn-warning btn-sm"> <i class="fa-regular fa-pen-to-square"></i> Editar</a>
+                            <a href="?delete=<?= $cliente['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este cliente?')"><i class="fa-regular fa-trash-can"></i> Excluir</a>
+                            <a href="?archive=<?= $cliente['id'] ?>" class="btn btn-secondary btn-sm"><i class="fa-solid fa-box-archive"></i> Arquivar</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>

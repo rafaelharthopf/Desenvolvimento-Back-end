@@ -74,20 +74,34 @@ if ($empresaId == 1) {
             font-weight: bold;
             color: #28a745;
         }
+        .btn-secondary {
+            background-color: #6c757d; 
+            border: none;
+            width: 200px; 
+            text-align: center;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268; 
+            width: 200px; 
+            text-align: center;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="card p-4">
-        <?php if (isset($_SESSION['user_id'])): ?>
-            <a href="dashboard.php" class="btn btn-primary btn-sm d-flex align-items-center w-auto">
-                <i class="fas fa-tachometer-alt me-2"></i> Ir para o Dashboard
-            </a>
-        <?php else: ?>
-            <a href="index.php" class="btn btn-secondary btn-sm d-flex align-items-center w-auto">
-                <i class="fas fa-home me-2"></i> Página Inicial
-            </a>
-        <?php endif; ?>
+            <div class="d-flex justify-content-center">
+                <?php if (isset($_SESSION['user_id'])): ?>
+                    <a href="dashboard.php" class="btn btn-primary btn-sm d-flex align-items-center w-auto">
+                         Ir para o Dashboard
+                    </a>
+                <?php else: ?>
+                    <a href="index.php" class="btn btn-secondary btn-sm d-flex align-items-center w-auto">
+                         Página Inicial
+                    </a>
+                <?php endif; ?>
+            </div>
+
             <h2>Sobre a Empresa</h2>
             <h4>Quadro de Sócios</h4>
             <p><b>Deborah Rocha Rodrigues Zola</b> - Sócio-Administrador</p>

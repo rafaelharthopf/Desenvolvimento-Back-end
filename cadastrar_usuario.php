@@ -73,9 +73,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .btn-secondary {
             background-color: #6c757d; 
             border: none;
+            width: 150px; 
+            text-align: center;
         }
         .btn-secondary:hover {
             background-color: #5a6268; 
+            width: 150px; 
+            text-align: center;
         }
     </style>
 </head>
@@ -83,6 +87,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="container">
     <div class="card p-4">
         <h2>Cadastrar Usuário</h2>
+        <?php if (isset($mensagem)): ?>
+            <div class="alert alert-info mt-3"><?= htmlspecialchars($mensagem) ?></div>
+        <?php endif; ?>
         <form method="post">
             <div class="mb-3">
                 <label for="username" class="form-label">Nome de Usuário</label>
@@ -108,16 +115,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label for="numero_oab" class="form-label">Número da OAB</label>
                 <input type="text" class="form-control" id="numero_oab" name="numero_oab" required>
             </div>
-            <button type="submit" class="btn btn-primary">Criar</button>
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary">Cadastrar</button>
+            </div>
         </form>
 
+        <div class="d-flex justify-content-center">
         <?php if (!isset($_SESSION['user_id'])): ?>
-            <a href="index.php" class="btn btn-secondary mt-3">Voltar para a Página Inicial</a>
+            <a href="login.php" class="btn btn-secondary mt-3">Página de Login</a>
         <?php endif; ?>
-
-        <?php if (isset($mensagem)): ?>
-            <div class="alert alert-info mt-3"><?= htmlspecialchars($mensagem) ?></div>
-        <?php endif; ?>
+        </div>
     </div>
 </div>
 <?php include 'footer.php'; ?>

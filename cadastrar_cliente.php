@@ -9,12 +9,29 @@ include 'header.php';
 
 require('fpdf/fpdf.php');
 
-function criarCliente($pdo, $dadosCliente) {
+function criarCliente($pdo, $dadosCliente, $fotoCliente) {
     if (empty($dadosCliente['cpf_cnpj']) || empty($dadosCliente['nome']) || empty($dadosCliente['email'])) {
         return "Erro: CPF/CNPJ, Nome e E-mail são obrigatórios.";
     }
 
-    $stmt = $pdo->prepare('INSERT INTO clientes (cpf_cnpj, nome, rg_ie, email, endereco, conjugue, nome_mae, data_nascimento, local_nascimento, pasep_pis, numero_beneficio) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    $fotoNome = null;
+    if ($fotoCliente && $fotoCliente['error'] == UPLOAD_ERR_OK) {
+        $extensao = pathinfo($fotoCliente['name'], PATHINFO_EXTENSION);
+        $tiposPermitidos = ['jpg', 'jpeg', 'png', 'gif'];
+
+        if (in_array(strtolower($extensao), $tiposPermitidos)) {
+            $fotoNome = time() . '_' . $fotoCliente['name'];
+            $caminhoDestino = 'uploads/' . $fotoNome;
+
+            if (!move_uploaded_file($fotoCliente['tmp_name'], $caminhoDestino)) {
+                return "Erro ao mover o arquivo de foto.";
+            }
+        } else {
+            return "Erro: Apenas arquivos de imagem (JPG, PNG, GIF) são permitidos.";
+        }
+    }
+
+    $stmt = $pdo->prepare('INSERT INTO clientes (cpf_cnpj, nome, rg_ie, email, endereco, conjugue, nome_mae, data_nascimento, local_nascimento, pasep_pis, numero_beneficio, foto_cliente) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
     if ($stmt->execute([
         $dadosCliente['cpf_cnpj'],
         $dadosCliente['nome'],
@@ -26,7 +43,8 @@ function criarCliente($pdo, $dadosCliente) {
         $dadosCliente['data_nascimento'] ?? null,
         $dadosCliente['local_nascimento'] ?? null,
         $dadosCliente['pasep_pis'] ?? null,
-        $dadosCliente['numero_beneficio'] ?? null
+        $dadosCliente['numero_beneficio'] ?? null,
+        $fotoNome
     ])) {
         return $pdo->lastInsertId();
     } else {
@@ -34,10 +52,13 @@ function criarCliente($pdo, $dadosCliente) {
     }
 }
 
+
+
 $empresaId = 1;
-$empresa = $pdo->prepare('SELECT * FROM configuracoes WHERE id = ?');
+$empresa = $pdo->prepare('SELECT nome_sistema FROM configuracoes WHERE id = ?');
 $empresa->execute([$empresaId]);
 $empresa = $empresa->fetch();
+$empresa = $empresa['nome_sistema'];
 
 function gerarContratoPDF($dadosCliente, $clienteId) {
     try {
@@ -58,11 +79,10 @@ function gerarContratoPDF($dadosCliente, $clienteId) {
         $textoContrato = "Cláusula 1: O cliente está ciente e concorda com o tratamento de seus dados pessoais conforme a Lei Geral de Proteção de Dados (LGPD). Todos os dados fornecidos são tratados de maneira confidencial e não serão divulgados sem o seu consentimento, exceto quando exigido por lei.\n\nCláusula 2: O cliente concorda com as condições do contrato de trabalho, incluindo as responsabilidades e direitos estabelecidos, que serão detalhados posteriormente. O presente contrato entra em vigor a partir da data de assinatura.";
         $pdf->MultiCell(0, 10, utf8_decode($textoContrato));
         $pdf->Ln(10);
-        $pdf->Cell(80, 10, '_________________________', 0, 1, 'L');
+        $pdf->Cell(80, 10, '___________________________________________________________________________', 0, 1, 'L');
         $pdf->Cell(80, 10, utf8_decode($dadosCliente['nome']), 0, 1, 'L');
-        $pdf->Cell(80, 10, '_________________________', 0, 1, 'L');
-        $pdf->Cell(80, 10, utf8_decode($empresa['nome_sistema']), 0, 1, 'L');
-
+        $pdf->Cell(80, 10, '___________________________________________________________________________', 0, 1, 'L');
+        $pdf->Cell(80, 10, utf8_decode('Zola & Klébis Sociedade de Advogados'), 0, 1, 'L');
         $nomeArquivoPDF = 'contrato_cliente_' . $clienteId . '.pdf';
         $caminhoArquivo = 'uploads/' . $nomeArquivoPDF;
         
@@ -77,7 +97,7 @@ $mensagem = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['aceite']) && $_POST['aceite'] == 'on') {
-        $clienteId = criarCliente($pdo, $_POST);
+        $clienteId = criarCliente($pdo, $_POST, $_FILES['foto_cliente']);
         
         if (is_numeric($clienteId)) {
             $nomeArquivoPDF = gerarContratoPDF($_POST, $clienteId);
@@ -137,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php if ($mensagem): ?>
             <div class="alert alert-info mt-3"><?= $mensagem ?></div>
         <?php endif; ?>
-        <form method="post">
+        <form method="post" enctype="multipart/form-data"> 
             <div class="mb-3">
                 <label for="cpf_cnpj" class="form-label">CPF/CNPJ</label>
                 <input type="text" class="form-control" id="cpf_cnpj" name="cpf_cnpj" required>
@@ -182,7 +202,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label for="numero_beneficio" class="form-label">Número de Benefício</label>
                 <input type="text" class="form-control" id="numero_beneficio" name="numero_beneficio">
             </div>
-
+            <div class="mb-3">
+                <label for="foto_cliente" class="form-label">Foto do Cliente</label>
+                <input type="file" class="form-control" id="foto_cliente" name="foto_cliente" accept="image/*">
+            </div>
             <div class="form-check mb-3">
                 <input class="form-check-input" type="checkbox" value="on" id="aceite" name="aceite" required>
                 <label class="form-check-label" for="aceite">

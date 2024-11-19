@@ -46,7 +46,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['arquivo'])) {
     $stmt = $pdo->prepare("INSERT INTO arquivos (cliente_id, nome, caminho, data_upload, arquivo_comprimido) VALUES (?, ?, ?, ?, ?)");
     $stmt->execute([$clienteId, $nomeArquivo, $uploadDir . $nomeArquivo, $dataUpload, $conteudoComprimido]);
 
-    echo "Arquivo carregado e comprimido com sucesso!";
+    $_SESSION['mensagem'] = "Arquivo adicionado com sucesso!";
+
+    echo "<script>
+        window.location.href = 'detalhes_cliente.php?id=" . $clienteId . "';
+    </script>";
+    exit;
 }
 
 $stmt = $pdo->prepare('SELECT nome, caminho, arquivo_comprimido, data_upload FROM arquivos WHERE cliente_id = ?');
@@ -61,8 +66,8 @@ if ($arquivos) {
         file_put_contents($caminhoDescomprimido, $conteudoDescomprimido);
     }
 }
-
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -93,39 +98,80 @@ if ($arquivos) {
         .btn-primary:hover {
             background-color: #0056b3; 
         }
+        .foto-cliente {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .foto-cliente img {
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
         footer {
             margin-top: 30px;
             padding: 20px 0;
             background-color: #f8f9fa;
             text-align: center;
         }
+
+        .foto-cliente img { 
+            width: 150px; 
+            height: 150px; 
+            object-fit: cover; 
+            border-radius: 10px; }
     </style>
 </head>
 <body>
 <div class="container">
-    <h2>Detalhes do Cliente: <?php echo htmlspecialchars($cliente['nome']); ?></h2>
-    <h3>Upload de Arquivo</h3>
-    <form action="detalhes_cliente.php?id=<?php echo $clienteId; ?>" method="POST" enctype="multipart/form-data">
-        <div class="mb-3">
-            <label for="arquivo" class="form-label">Escolha um arquivo para enviar:</label>
-            <input type="file" class="form-control" id="arquivo" name="arquivo" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Carregar Arquivo</button>
-    </form>
-    <h2>Arquivos de <?= htmlspecialchars($cliente['nome'] ?? 'Cliente Desconhecido') ?></h2>
-    <?php if (empty($arquivos)): ?>
-    <p>Nenhum arquivo anexado.</p>
-    <?php else: ?>
-    <ul class="list-group">
-        <?php foreach ($arquivos as $arquivo): ?>
-            <li class="list-group-item">
-                <a href="<?= $arquivo['caminho'] ?>" download="<?= $arquivo['nome'] ?>" class="btn btn-link"><?= htmlspecialchars($arquivo['nome']) ?></a>
-                <br>
-                <small>Data de Upload: <?= htmlspecialchars($arquivo['data_upload']) ?></small>
-            </li>
-        <?php endforeach; ?>
-    </ul>
-    <?php endif; ?>
+    <div class="card p-4">
+        <?php
+            if (isset($_SESSION['mensagem'])) {
+                echo "<div class='alert alert-info'>" . $_SESSION['mensagem'] . "</div>";
+                unset($_SESSION['mensagem']); 
+            }
+        ?>
+        <h2>Detalhes do Cliente: <?php echo htmlspecialchars($cliente['nome']); ?></h2>
+        <?php if ($cliente['foto_cliente']): ?>
+            <div class="foto-cliente">
+                <img src="uploads/<?php echo htmlspecialchars($cliente['foto_cliente']); ?>" alt="Foto do cliente">
+            </div>
+        <?php else: ?>
+            <p>Sem foto disponível.</p>
+        <?php endif; ?>
+    </div>
+
+    <div class="card p-4">
+        <h3>Upload de Arquivo</h3>
+        <form action="detalhes_cliente.php?id=<?php echo $clienteId; ?>" method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="arquivo" class="form-label">Escolha um arquivo para enviar:</label>
+                <input type="file" class="form-control" id="arquivo" name="arquivo" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Carregar Arquivo</button>
+        </form>
+    </div>
+
+    <div class="card p-4">
+        <h4>Arquivos de <?= htmlspecialchars($cliente['nome']); ?></h4>
+        <?php if (empty($arquivos)): ?>
+            <p>Nenhum arquivo anexado.</p>
+        <?php else: ?>
+            <ul class="list-group">
+                <?php foreach ($arquivos as $arquivo): ?>
+                    <li class="list-group-item">
+                        <a href="<?= htmlspecialchars($arquivo['caminho']); ?>" download class="btn btn-link">
+                            <?= htmlspecialchars($arquivo['nome']); ?>
+                        </a>
+                        <br>
+                        <small>Data de Upload: <?= htmlspecialchars($arquivo['data_upload']); ?></small>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+    </div>
+
     <div class="card p-4">
         <h4>Processos</h4>
         <?php if (count($processos) > 0): ?>
@@ -142,6 +188,7 @@ if ($arquivos) {
             <p>Este cliente não possui processos registrados.</p>
         <?php endif; ?>
     </div>
+
     <div class="mt-3">
         <a href="editar_cliente.php?id=<?php echo urlencode($cliente['id']); ?>" class="btn btn-primary">Editar Cliente</a>
     </div>

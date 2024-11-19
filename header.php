@@ -144,7 +144,7 @@ if ($empresaId == 1) {
                     <div class="dropdown-content">
                         <a href="clientes_andamento.php">Ver Processos Em Andamento</a>
                         <a href="clientes_concluido.php">Ver Processos Concluídos</a>
-                        <a href="clientes_parados.php">Ver Processos Parados</a>
+                        <a href="clientes_parados.php">Ver Processos Suspensos</a>
                         <a href="clientes_arquivados.php">Ver Processos Arquivados</a>
                         <a href="cadastrar_processo.php">Cadastrar Processo</a>
                     </div>

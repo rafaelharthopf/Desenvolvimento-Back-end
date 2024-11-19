@@ -1,11 +1,13 @@
 <?php
 session_start(); 
+
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     exit; 
 }
-include 'db.php';
-include 'header.php';
+
+include 'db.php';  
+include 'header.php';  
 
 if (!isset($_GET['id'])) {
     header('Location: dashboard.php');
@@ -19,6 +21,26 @@ $cliente = $cliente->fetch();
 
 if (!$cliente) {
     header('Location: dashboard.php');
+    exit;
+}
+
+if (isset($_GET['remove_foto']) && $_GET['remove_foto'] == 'true') {
+    if ($cliente['foto_cliente']) {
+        $fotoPath = 'uploads/' . $cliente['foto_cliente'];
+
+        if (file_exists($fotoPath)) {
+            unlink($fotoPath);
+        }
+
+        $stmt = $pdo->prepare('UPDATE clientes SET foto_cliente = NULL WHERE id = ?');
+        $stmt->execute([$clienteId]);
+
+        $_SESSION['mensagem'] = "Foto removida com sucesso!";
+    }
+
+    echo "<script>
+        window.location.href = 'editar_cliente.php?id=" . $clienteId . "';
+    </script>";
     exit;
 }
 
@@ -36,10 +58,20 @@ if ($_POST) {
         'pasep_pis' => $_POST['pasep_pis'] ?? null,
         'numero_beneficio' => $_POST['numero_beneficio'] ?? null,
     ];
-    sleep(2);
+
+    if (isset($_FILES['foto_cliente']) && $_FILES['foto_cliente']['error'] == 0) {
+        $fotoTmp = $_FILES['foto_cliente']['tmp_name'];
+        $fotoNome = time() . '_' . $_FILES['foto_cliente']['name'];
+        $fotoDestino = 'uploads/' . $fotoNome;
+        move_uploaded_file($fotoTmp, $fotoDestino);
+        $dadosCliente['foto_cliente'] = $fotoNome;
+    } else {
+        $dadosCliente['foto_cliente'] = $cliente['foto_cliente'];
+    }
+
     $_SESSION['mensagem'] = "Dados do cliente atualizados com sucesso.";
 
-    $stmt = $pdo->prepare('UPDATE clientes SET cpf_cnpj = ?, nome = ?, rg_ie = ?, email = ?, endereco = ?, conjugue = ?, nome_mae = ?, data_nascimento = ?, local_nascimento = ?, pasep_pis = ?, numero_beneficio = ? WHERE id = ?');
+    $stmt = $pdo->prepare('UPDATE clientes SET cpf_cnpj = ?, nome = ?, rg_ie = ?, email = ?, endereco = ?, conjugue = ?, nome_mae = ?, data_nascimento = ?, local_nascimento = ?, pasep_pis = ?, numero_beneficio = ?, foto_cliente = ? WHERE id = ?');
     $stmt->execute([
         $dadosCliente['cpf_cnpj'],
         $dadosCliente['nome'],
@@ -52,15 +84,18 @@ if ($_POST) {
         $dadosCliente['local_nascimento'],
         $dadosCliente['pasep_pis'],
         $dadosCliente['numero_beneficio'],
+        $dadosCliente['foto_cliente'],
         $clienteId
     ]);
+
     echo "<script>
         window.location.href = 'editar_cliente.php?id=" . $clienteId . "';
     </script>";
     exit;
-    
+
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -68,6 +103,8 @@ if ($_POST) {
     <meta charset="UTF-8">
     <title>Editar Cliente - Sistema Advocacia</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
     <style>
         body {
             background-color: #f4f7fa;
@@ -118,7 +155,7 @@ if ($_POST) {
         }
         ?>
 
-        <form method="POST" onsubmit="showLoading()">
+        <form method="POST" enctype="multipart/form-data" onsubmit="showLoading()">
             <div id="loading">
                 <img src="https://i.gifer.com/YCZH.gif" alt="Carregando..."> Carregando, por favor aguarde...
             </div>
@@ -165,6 +202,19 @@ if ($_POST) {
             <div class="mb-3">
                 <label for="numero_beneficio" class="form-label">Número de Benefício</label>
                 <input type="text" class="form-control" id="numero_beneficio" name="numero_beneficio" value="<?php echo htmlspecialchars($cliente['numero_beneficio']); ?>">
+            </div>
+            <div class="mb-3">
+                <label for="foto" class="form-label">Foto</label>
+                <?php if ($cliente['foto_cliente']): ?>
+                    <div>
+                        <img src="uploads/<?php echo htmlspecialchars($cliente['foto_cliente']); ?>" alt="Foto do cliente" width="100" height="100">
+                        <a href="editar_cliente.php?id=<?php echo $clienteId; ?>&remove_foto=true" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash-alt"></i> Remover Foto
+                        </a>
+
+                    </div>
+                <?php endif; ?>
+                <input type="file" class="form-control" id="foto_cliente" name="foto_cliente" accept="image/*">
             </div>
 
             <div class="d-flex justify-content-between">

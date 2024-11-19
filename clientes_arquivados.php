@@ -55,7 +55,7 @@ $clientesArquivados = buscarClientesArquivados($pdo);
 <body>
 <div class="container">
     <div class="card p-4">
-        <h2>Clientes Arquivados</h2>
+        <h2>Processos Arquivados</h2>
         <table class="table table-striped">
             <thead>
                 <tr>

@@ -99,10 +99,10 @@ function cadastrarProcesso($pdo, $dadosProcesso) {
                 <label for="tipo" class="form-label">Tipo</label>
                 <select class="form-select" id="tipo" name="tipo" required>
                     <option value="" disabled selected>Escolha um tipo</option>
-                    <option value="civil">Civil</option>
-                    <option value="trabalhista">Trabalhista</option>
-                    <option value="previdenciario">Previdenciário</option>
-                    <option value="tribunal_de_etica">Tribunal de Ética</option>
+                    <option value="Civil">Civil</option>
+                    <option value="Trabalhista">Trabalhista</option>
+                    <option value="Previdenciário">Previdenciário</option>
+                    <option value="Tribunal de Ética">Tribunal de Ética</option>
                 </select>
             </div>
             <div class="mb-3">

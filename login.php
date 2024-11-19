@@ -53,9 +53,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .btn-primary {
             background-color: #007bff;
             border: none;
+            width: 150px; 
+            text-align: center;
         }
         .btn-primary:hover {
             background-color: #0056b3; 
+            width: 150px; 
+            text-align: center;
         }
         footer {
             background-color: #f8f9fa;
@@ -68,19 +72,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .alert-danger {
             margin-top: 1rem;
         }
+        .btn-secondary {
+            background-color: #6c757d; 
+            border: none;
+            width: 200px; 
+            text-align: center;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268; 
+            width: 200px; 
+            text-align: center;
+        }
     </style>
 </head>
 <body>
 <div class="container mt-5">
-    <?php if (isset($_SESSION['user_id'])): ?>
-            <a href="dashboard.php" class="btn btn-primary btn-sm d-flex align-items-center w-auto">
-                <i class="fas fa-tachometer-alt me-2"></i> Ir para o Dashboard
-            </a>
-        <?php else: ?>
-            <a href="index.php" class="btn btn-secondary btn-sm d-flex align-items-center w-auto">
-                <i class="fas fa-home me-2"></i> Página Inicial
-            </a>
-        <?php endif; ?>
+        <div class="d-flex justify-content-center">
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="dashboard.php" class="btn btn-primary btn-sm d-flex align-items-center w-auto">
+                    <i class="fas fa-tachometer-alt me-2"></i> Ir para o Dashboard
+                </a>
+            <?php else: ?>
+                <a href="index.php" class="btn btn-secondary btn-sm d-flex align-items-center w-auto">
+                     Página Inicial
+                </a>
+            <?php endif; ?>
+        </div>
     <h2 class="text-center">Login</h2>
     <form method="post" class="mt-3">
     <?php if (isset($erro)) echo "<div class='alert alert-danger mt-2'>$erro</div>"; ?>

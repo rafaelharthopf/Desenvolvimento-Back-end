@@ -55,7 +55,7 @@ $clientesConcluido = buscarClientesConcluido($pdo);
 <body>
 <div class="container">
     <div class="card p-4">
-        <h2>Clientes Concluído</h2>
+        <h2>Processos Concluído</h2>
         <table class="table table-striped">
             <thead>
                 <tr>
