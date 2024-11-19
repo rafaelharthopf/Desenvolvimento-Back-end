@@ -1,8 +1,8 @@
 <?php
-$host = 'phpmyadmin.mikrotikrio.dev.br';
-$dbname = 'mkauth';
-$username = 'rafael@receitanet.net';
-$password = 'Bavarias@1996';
+$host = 'localhost';
+$dbname = 'sistema_advocacia';
+$username = 'root';
+$password = 'Bavarias1996';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
@@ -89,12 +89,6 @@ try {
     die("Erro de conexão: " . $e->getMessage());
 }
 
-
-
-// $host = 'localhost';
-// $dbname = 'sistema_advocacia';
-// $username = 'root';
-// $password = '';
 
 // try {
 //     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
