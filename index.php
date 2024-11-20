@@ -7,23 +7,28 @@ if ($empresaId == 1) {
     $stmt = $pdo->prepare("SELECT * FROM configuracoes WHERE id = ?");
     $stmt->execute([$empresaId]);
     $configuracao = $stmt->fetch(PDO::FETCH_ASSOC);
-    $userId = $_SESSION['user_id'];
-    $stmt = $pdo->prepare('SELECT nome_completo FROM usuarios WHERE id = ?');
-    $stmt->execute([$userId]);
-    $usuario = $stmt->fetch();
+    
+    $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+    if ($userId) {
+        $stmt = $pdo->prepare('SELECT nome_completo FROM usuarios WHERE id = ?');
+        $stmt->execute([$userId]);
+        $usuario = $stmt->fetch();
+    } else {
+        $usuario = null;
+    }
 
     if ($configuracao) {
         $nomeEmpresa = htmlspecialchars($configuracao['nome_sistema']);
         $enderecoEmpresa = htmlspecialchars($configuracao['endereco_sistema']);
         $emailEmpresa = htmlspecialchars($configuracao['email']);
         $telefoneEmpresa = htmlspecialchars($configuracao['telefone']);
-        $logoEmpresa = htmlspecialchars($configuracao['logo']);
+        $logoEmpresa = isset($configuracao['logo']) ? htmlspecialchars($configuracao['logo']) : '/uploads/logos/logo.jpg';
     } else {
         $nomeEmpresa = 'Nome da Empresa Não Encontrado';
         $enderecoEmpresa = 'Endereço da Empresa Não Encontrado';
         $emailEmpresa = 'Email da Empresa Não Encontrado';
         $telefoneEmpresa = 'Telefone da Empresa Não Encontrado';
-        $logoEmpresa = ''; 
+        $logoEmpresa = '/uploads/logos/logo.jpg';
     }
 } else {
     $nomeEmpresa = 'Sistema Advocacia';

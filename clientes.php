@@ -8,11 +8,20 @@ if (!isset($_SESSION['user_id'])) {
 include 'header.php';
 
 function buscarClientes($pdo) {
-    $stmt = $pdo->query("SELECT clientes.id, clientes.cpf_cnpj, clientes.nome, clientes.email, processos.status 
-                         FROM clientes
-                         LEFT JOIN processos ON clientes.id = processos.cliente_id");
+    $stmt = $pdo->query("
+        SELECT 
+            clientes.id, 
+            clientes.cpf_cnpj, 
+            clientes.nome, 
+            clientes.email, 
+            GROUP_CONCAT(processos.status SEPARATOR ', ') AS processos_status
+        FROM clientes
+        LEFT JOIN processos ON clientes.id = processos.cliente_id
+        GROUP BY clientes.id, clientes.cpf_cnpj, clientes.nome, clientes.email
+    ");
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
 
 $clientes = buscarClientes($pdo);
 
@@ -89,7 +98,6 @@ if (isset($_GET['archive'])) {
                     <th>CPF/CNPJ</th>
                     <th>Nome</th>
                     <th>Email</th>
-                    <th>Status</th>
                     <th>Ações</th>
                 </tr>
             </thead>
@@ -103,7 +111,6 @@ if (isset($_GET['archive'])) {
                             </a>
                         </td>
                         <td><?= htmlspecialchars($cliente['email']) ?></td>
-                        <td><?= htmlspecialchars($cliente['status']) ?></td>
                         <td>
                             <a href="editar_cliente.php?id=<?= $cliente['id'] ?>" class="btn btn-warning btn-sm"> <i class="fa-regular fa-pen-to-square"></i> Editar</a>
                             <a href="?delete=<?= $cliente['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Tem certeza que deseja excluir este cliente?')"><i class="fa-regular fa-trash-can"></i> Excluir</a>

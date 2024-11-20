@@ -2,7 +2,7 @@
 $host = 'localhost';
 $dbname = 'sistema_advocacia';
 $username = 'root';
-$password = 'Bavarias1996';
+$password = '';
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
